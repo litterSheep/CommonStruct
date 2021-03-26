@@ -57,8 +57,8 @@ ext {
     appId = 110015
     defAppName = "基础框架"
     //第三方SDK的密钥
-    UM_API_KEY = "5db408d50cafb20142001074"
-    UM_PUSH_KEY = "93cc08b1c48107b575caa21a4833efef"
-    WX_KEY = "wx3a726298efdcd991"
-    WX_SECRET = "da02f5c02b88a47e61d8f5bc3ccc2d49"
+    UM_API_KEY = "xxx"
+    UM_PUSH_KEY = "xxx"
+    WX_KEY = "xxx"
+    WX_SECRET = "xxx"
 }
