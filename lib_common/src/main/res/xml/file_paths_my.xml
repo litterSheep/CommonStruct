@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <root-path
+        name="path0"
+        path="" />
+
+    <!--代表外部存储区域的根目录下的文件 Environment.getExternalStorageDirectory()/com.package目录-->
+    <external-path
+        name="path1"
+        path="" />
+
+
+    <!--代表app 私有的存储区域 Context.getFilesDir()目录下的images目录 /data/user/0/com.package/files/-->
+    <files-path
+        name="path2"
+        path="" />
+
+    <!--代表app 私有的存储区域 Context.getCacheDir()目录下的images目录 /data/user/0/com.package/cache/-->
+    <cache-path
+        name="path3"
+        path="" />
+
+    <!--代表app 外部存储区域根目录下的文件 Context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)目录下的Pictures目录-->
+    <!--/storage/emulated/0/Android/data/com.package/files/-->
+    <external-files-path
+        name="path4"
+        path="" />
+
+    <!--代表app 外部存储区域根目录下的文件 Context.getExternalCacheDir目录下的images目录-->
+    <!--/storage/emulated/0/Android/data/com.package/cache/-->
+    <external-cache-path
+        name="path5"
+        path="" />
+
+</resources>

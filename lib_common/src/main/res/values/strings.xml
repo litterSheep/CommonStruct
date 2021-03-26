@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Common</string>
+
+    <string name="toast_loading_fail">加载失败~</string>
+    <string name="page_loading_fail">页面加载失败~</string>
+    <string name="dialog_loading_text">加载中&#8230;</string>
+    <string name="network_unavailable">当前网络不可用</string>
+    <string name="connect_server_fail">系统繁忙</string>
+    <string name="t_network_bad">当前网络状况差~</string>
+
+    <string name="layout_network_fail">你的设备网络未连接</string>
+    <string name="layout_network_bad">请检查重试！\n点击页面空白处刷新试试</string>
+    <string name="layout_no_data">暂无数据</string>
+    <string name="layout_retry">点击页面空白处刷新试试</string>
+
+    <string name="t_sign_incorrect">签名不一致，请下载正版APP</string>
+    <string name="t_sd_card_size_unEnough">sd卡空间不足</string>
+    <string name="t_apk_file_non_exist">安装包不存在，请重新下载</string>
+    <string name="t_install_error">安装错误，请重新下载安装</string>
+    <string name="t_install_version_error">请下载高于当前版本的应用</string>
+    <string name="update_dialog_title">有新的版本</string>
+    <string name="update_dialog_ok">现在升级</string>
+    <string name="update_dialog_cancel">取消</string>
+    <string name="update_dialog_msg">新版本已经下载，点击安装</string>
+    <string name="update_dialog_tip">当前网络不是wifi状态，是否继续下载</string>
+</resources>

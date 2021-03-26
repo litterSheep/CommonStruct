@@ -1,0 +1,4 @@
+include ':module_main'
+include ':lib_common'
+include ':module_app'
+rootProject.name = "CommonStruct"

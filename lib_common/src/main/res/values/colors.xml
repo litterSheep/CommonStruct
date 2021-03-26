@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="main_color">#6066DD</color>
+    <color name="main_color_second">#FF2B3B99</color>
+    <color name="main_color_press">#aa6066DD</color>
+    <color name="main_color_disable">#C3C3DC</color>
+
+
+    <color name="window_bg">#F6F5F8</color>
+    <color name="window_bg1">#F3F3F7</color>
+    <!--    <color name="window_bg">#FFEFF4F6</color>-->
+    <color name="black">#ff000000</color>
+    <color name="black_text">#ff333333</color>
+    <color name="black_text1">#FF282832</color>
+    <color name="top_title">#ffffffff</color>
+    <color name="top_title_text">#333333</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="half_transparent">#9000</color>
+    <color name="status_half_transparent">#15000000</color>
+    <color name="gray_bg">#d9d9d9</color>
+    <color name="gray_line">#EEEEFA</color>
+    <color name="gray_line2">#eaeaea</color>
+    <color name="gray_line_deep">#cccccc</color>
+    <color name="gray_text_hint">#bbb3b4</color>
+    <color name="gray_text">#FF727A7D</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red_tips">#FE5858</color>
+    <color name="item_press_color">#d3d4f2</color>
+    <color name="item_press_color_ripple">#aad3d4f2</color>
+
+    <color name="gray">#f0f0f0</color>
+    <color name="gray_placeholder">#88F2F2F9</color>
+    <color name="gray1">#ff999999</color>
+    <color name="green">#09bb07</color>
+    <color name="green_press">#5509bb07</color>
+</resources>

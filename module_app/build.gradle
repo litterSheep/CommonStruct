@@ -1,0 +1,116 @@
+plugins {
+    id 'com.android.application'
+}
+
+static def buildTime() {
+    return new Date().format("yyyyMMdd")
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("E:/xxx")
+            storePassword 'xxx'
+            keyAlias 'xxx'
+            keyPassword 'xxx'
+        }
+    }
+
+    defaultConfig {
+        applicationId applicationId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        multiDexEnabled true
+
+        manifestPlaceholders = [APP_ID       : rootProject.ext.appId
+                                , UM_API_KEY : rootProject.ext.UM_API_KEY
+                                , UM_PUSH_KEY: rootProject.ext.UM_PUSH_KEY
+                                , WX_KEY     : rootProject.ext.WX_KEY
+                                , WX_SECRET  : rootProject.ext.WX_SECRET
+        ]
+
+        //ARouter
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources false
+//            signingConfig signingConfigs.release
+        }
+
+        release {
+            //混淆
+            minifyEnabled true
+            //Zipalign优化
+            zipAlignEnabled true
+            //移除无用Resources文件
+            shrinkResources true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    android.applicationVariants.all { variant ->
+        if (variant.buildType.name == "release")
+            variant.packageApplicationProvider.get().outputDirectory = new File(project.rootDir.absolutePath + "/apk/" + variant.buildType.name)
+
+        def fileName
+        def packageLastName = applicationId.substring(applicationId.lastIndexOf(".") + 1, applicationId.length())
+        println(">>>>>>>>>>>>>packageLastName:" + packageLastName)
+        fileName = packageLastName + "_${variant.productFlavors[0].name}" + "_v${defaultConfig.versionName}_${variant.buildType.name}_" + buildTime()
+        if (variant.buildType.name == "release") {
+            fileName = fileName.toUpperCase()
+        }
+        fileName = fileName + ".apk"
+//        variant.getPackageApplicationProvider().get().outputScope.apkDatas.forEach { apkData ->
+//            apkData.outputFileName = fileName
+//        }
+
+        variant.outputs.each { output ->
+            output.outputFileName = fileName
+        }
+    }
+
+    //定义不同产品的不同维度，没有该需求，定义为空
+    flavorDimensions("")
+    //渠道Flavors，配置不同风格的app
+    productFlavors {
+        only_test {
+            // Enable pre-dexing to produce an APK that can be tested on
+            // Android 5.0+ without the time-consuming DEX build processes.
+            minSdkVersion 21
+            manifestPlaceholders = [APP_NAME: rootProject.ext.defAppName, CHANNEL_ID: "only_test"]
+        }
+
+        official {
+            manifestPlaceholders = [APP_NAME: rootProject.ext.defAppName, CHANNEL_ID: "official"]
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    if (isModule.toBoolean()) {
+        implementation project(':lib_common')
+    } else {
+        implementation project(':module_main')
+    }
+}

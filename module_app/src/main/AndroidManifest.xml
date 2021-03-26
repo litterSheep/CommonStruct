@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ly.commonstruct">
+
+    <application
+        android:name="com.ly.common.frame.BaseApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="${APP_NAME}"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CommonStruct">
+
+        <meta-data
+            android:name="APP_ID"
+            android:value="${APP_ID}" />
+
+        <meta-data
+            android:name="CHANNEL_ID"
+            android:value="${CHANNEL_ID}" />
+        <meta-data
+            android:name="UM_API_KEY"
+            android:value="${UM_API_KEY}" />
+        <meta-data
+            android:name="UM_PUSH_KEY"
+            android:value="${UM_PUSH_KEY}" />
+    </application>
+
+</manifest>

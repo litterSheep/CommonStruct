@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    ext.kotlin_version = '1.4.31'
+    ext.objectboxVersion = '2.9.1'
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.1.0"
+        classpath "com.alibaba:arouter-register:1.0.2"
+        classpath "io.objectbox:objectbox-gradle-plugin:$objectboxVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        //支持arr包
+        flatDir {
+            dirs '../common/libs'
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+ext {
+    //true:开启单module运行
+    isModule = false
+    minSdkVersion = 16//4.1
+    targetSdkVersion = 26
+    javaVersion = JavaVersion.VERSION_1_8
+
+    compileSdkVersion = 30
+    buildToolsVersion = "30.0.3"
+    supportLibraryVersion = "28.0.0"
+
+    hostDebug = "http://xxx/"//预发布
+    hostRelease = "https://xxx/"
+
+    versionCode = 220
+    versionName = "2.2.0"
+
+    //ARouter
+    arouterCompiler = "1.5.1"
+    glide = "4.12.0"
+
+    applicationId = "com.ly.commonstruct"
+    appId = 110015
+    defAppName = "基础框架"
+    //第三方SDK的密钥
+    UM_API_KEY = "5db408d50cafb20142001074"
+    UM_PUSH_KEY = "93cc08b1c48107b575caa21a4833efef"
+    WX_KEY = "wx3a726298efdcd991"
+    WX_SECRET = "da02f5c02b88a47e61d8f5bc3ccc2d49"
+}
