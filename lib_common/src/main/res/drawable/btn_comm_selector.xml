@@ -1,21 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true">
-        <shape>
-            <corners android:radius="80dp" />
-            <gradient android:angle="360" android:endColor="#aaB48BED" android:startColor="@color/main_color_press" />
-        </shape>
+<?xml version="1.0" encoding="utf-8"?><!-- ripple 是5.0才出现的新标签-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@color/gray_bg"
+    tools:targetApi="lollipop"><!-- 点击出现的水波纹的颜色 -->
+
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape>
+                    <corners android:radius="80dp" />
+                    <gradient
+                        android:angle="360"
+                        android:endColor="#aaB48BED"
+                        android:startColor="@color/main_color_press" />
+
+                </shape>
+            </item>
+            <item android:state_enabled="false">
+                <shape>
+                    <corners android:radius="80dp" />
+                    <solid android:color="@color/main_color_disable" />
+                </shape>
+            </item>
+            <item android:state_enabled="true">
+                <shape>
+                    <corners android:radius="80dp" />
+                    <gradient
+                        android:angle="360"
+                        android:endColor="#B48BED"
+                        android:startColor="@color/main_color" />
+                </shape>
+            </item>
+        </selector>
     </item>
-    <item android:state_enabled="false">
-        <shape>
-            <corners android:radius="80dp" />
-            <solid android:color="@color/main_color_disable" />
-        </shape>
-    </item>
-    <item android:state_enabled="true">
-        <shape>
-            <corners android:radius="80dp" />
-            <gradient android:angle="360" android:endColor="#B48BED" android:startColor="@color/main_color" />
-        </shape>
-    </item>
-</selector>
+
+</ripple>

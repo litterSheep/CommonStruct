@@ -1,13 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true">
-        <shape>
-            <solid android:color="@color/item_press_color" />
-        </shape>
+<?xml version="1.0" encoding="utf-8"?><!-- ripple 是5.0才出现的新标签-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="@color/item_press_color_ripple"
+    tools:targetApi="lollipop"><!-- 点击出现的水波纹的颜色 -->
+
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape>
+                    <solid android:color="@color/item_press_color" />
+                </shape>
+            </item>
+            <item android:state_pressed="false">
+                <shape>
+                    <solid android:color="@color/white" />
+                </shape>
+            </item>
+        </selector>
     </item>
-    <item android:state_pressed="false">
-        <shape>
-            <solid android:color="@color/white" />
-        </shape>
-    </item>
-</selector>
+
+</ripple>
