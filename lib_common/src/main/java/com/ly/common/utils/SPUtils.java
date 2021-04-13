@@ -29,7 +29,7 @@ import android.content.SharedPreferences;
  *
  * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-3-6
  */
-public class PreferencesUtils {
+public class SPUtils {
 
     private static String PREFERENCE_NAME = "IDai";
 
