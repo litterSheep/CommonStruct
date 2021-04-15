@@ -41,7 +41,7 @@ public class LoadingDialog extends Dialog {
         setContentView(R.layout.dialog_loading);
 
         if (getWindow() != null)
-            getWindow().setWindowAnimations(R.style.pop_in_out_anim);
+            getWindow().setWindowAnimations(R.style.anim_dialog_common);
         setCanceledOnTouchOutside(false);
     }
 

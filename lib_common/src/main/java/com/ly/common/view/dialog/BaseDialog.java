@@ -1,51 +1,68 @@
 package com.ly.common.view.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 
 import com.ly.common.R;
-
+import com.ly.common.utils.ScreenUtil;
 
 /**
- * @author ly
- * date 2019/8/1 17:36
+ * Created by ly on 2021/4/15 14:49
  */
-public abstract class BaseDialog extends Dialog {
+public abstract class BaseDialog extends DialogFragment {
 
-    public BaseDialog(@NonNull Context context) {
-        this(context, R.style.dialog_style);
+    public final AppCompatActivity mContext;
+
+    public BaseDialog(@NonNull AppCompatActivity mContext) {
+        this.mContext = mContext;
     }
 
-    public BaseDialog(@NonNull Context context, int themeResId) {
-        super(context, themeResId);
-    }
-
-    protected BaseDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
-        super(context, cancelable, cancelListener);
-    }
-
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(getLayoutResId());
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Dialog dialog = this.getDialog();
+        if (dialog != null) {
+            //去掉dialog的标题，需要在setContentView()之前
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            //点击外部可取消
+            dialog.setCanceledOnTouchOutside(true);
 
-        initViews();
-    }
+            Window window = dialog.getWindow();
+            //去掉dialog默认的padding
+            window.getDecorView().setPadding(0, 0, 0, 0);
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.width = ScreenUtil.getScreenWidth() * 6 / 7;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.gravity = Gravity.CENTER;
+            lp.windowAnimations = R.style.anim_dialog_common;
+            window.setAttributes(lp);
+            window.setBackgroundDrawable(new ColorDrawable());
+        }
 
-    public void initViews() {
-
+        View view = inflater.inflate(getLayoutResId(), container);
+        initViews(view);
+        return view;
     }
 
     public abstract int getLayoutResId();
 
+    public abstract void initViews(View view);
 
     public void show() {
         try {
-            super.show();
+            super.show(mContext.getSupportFragmentManager(), getClass().getSimpleName());
         } catch (Exception e) {
             e.printStackTrace();
         }
