@@ -1,10 +1,8 @@
 package com.ly.common.frame;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,7 +16,6 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.core.app.ActivityCompat;
 
 import com.kingja.loadsir.callback.Callback;
 import com.kingja.loadsir.core.LoadService;
@@ -67,8 +64,6 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
     //默认都需要标题 如果不需要标题，在对应的类上添加@PageTitle(isNeedTitle = false)
     private boolean mIsNeedTitle = true;
     private boolean mUseEventBus = false;
-    public boolean showPermissionDenyToast = true;
-    private OnRequestPermissionsResult onRequestPermissionsResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,56 +305,6 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
             if (activity != null)
                 activity.onHandleMessage(msg);
         }
-    }
-
-    public void reqPermissions(String[] permissions, int reqCode) {
-        ActivityCompat.requestPermissions(this, permissions, reqCode);
-    }
-
-    /**
-     * 统一处理权限被拒toast提示用户
-     * 1.在继承此类的activity 通过ActivityCompat.requestPermissions申请权限 会回调该方法
-     * 2.在继承此类的activity中创建的fragment 通过requestPermissions申请权限 同样会回调该函数
-     * Created by ly on 2018/11/15 9:38
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (onRequestPermissionsResult != null)
-            onRequestPermissionsResult.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for (int i = 0; i < grantResults.length; i++) {
-            String permission = permissions[i];
-            if (showPermissionDenyToast && grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                switch (permission) {
-                    case Manifest.permission.CAMERA:
-                        ToastUtil.showLong("相机启动失败，请到设置-权限管理中允许访问相机权限");
-                        break;
-                    case Manifest.permission.READ_CONTACTS:
-                        ToastUtil.showLong("读取联系人失败，请到设置-权限管理中允许访问电话、通讯录权限");
-                        break;
-                    case Manifest.permission.ACCESS_COARSE_LOCATION:
-                        ToastUtil.showLong("获取位置失败，请到设置-权限管理中允许访问位置权限");
-
-                        break;
-                    case Manifest.permission.READ_CALL_LOG:
-                        ToastUtil.showLong("获取通话记录失败，请到设置-权限管理中允许访问通话记录权限");
-
-                        break;
-                    default:
-                        break;
-                }
-            } else {
-                Logger.i("已允许permission：" + permission);
-            }
-        }
-    }
-
-    public interface OnRequestPermissionsResult {
-        void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults);
-    }
-
-    public void setOnRequestPermissionsResult(OnRequestPermissionsResult onRequestPermissionsResult) {
-        this.onRequestPermissionsResult = onRequestPermissionsResult;
     }
 
     public <T> void req(@NonNull Call<BaseResponse<T>> call, @NonNull ReqCallback<BaseResponse<T>> callback) {
