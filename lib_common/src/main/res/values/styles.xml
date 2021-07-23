@@ -22,35 +22,49 @@
         <item name="android:background">@color/gray_line</item>
     </style>
 
-    <style name="text_black">
-        <item name="android:textSize">16sp</item>
+    <style name="text">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/black_text1</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="text_gray">
-        <item name="android:textSize">14sp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textColor">@color/gray_text</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
+    <style name="text_primary_l" parent="text">
+        <item name="android:textSize">@dimen/text_l</item>
     </style>
 
-    <style name="text_white">
-        <item name="android:textSize">12sp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center_vertical</item>
+    <style name="text_primary_m" parent="text">
+        <item name="android:textSize">@dimen/text_m</item>
+    </style>
+
+    <style name="text_primary_s" parent="text">
+        <item name="android:textSize">@dimen/text_s</item>
+    </style>
+
+
+    <style name="text_second_l" parent="text">
+        <item name="android:textSize">@dimen/text_l</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+    </style>
+
+    <style name="text_second_m" parent="text">
+        <item name="android:textSize">@dimen/text_m</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+
+    </style>
+
+    <style name="text_second_s" parent="text">
+        <item name="android:textSize">@dimen/text_s</item>
+        <item name="android:textColor">?android:textColorSecondary</item>
+    </style>
+
+    <style name="text_white" parent="text">
+        <item name="android:textSize">@dimen/text_s</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
     </style>
+
 
     <!--自定义dialog背景全透明无边框 -->
     <style name="MyLoadDialog" parent="android:style/Theme.Dialog">

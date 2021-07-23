@@ -8,30 +8,31 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.ly.common.R;
 import com.ly.common.utils.PixelUtil;
 import com.ly.common.utils.ScreenUtil;
+import com.orhanobut.logger.Logger;
 
 
 /**
  * Android自定义标题栏
  */
 
-public class CustomTitleBar extends LinearLayout {
+public class CustomTitleBar extends RelativeLayout {
 
     //顶部左右图标的大小
     private int ICON_SIZE;
-    //顶部图标左/右的padding
-    private int ICON_PADDING;
 
-    private RelativeLayout rootView, rl_title_right;
+    private RelativeLayout  rl_title_right;
     private TextView tvLeftBtn, tvClose;
     private TextView tvRightBtn, tvTips;
     private TextView tvTitle;
@@ -69,7 +70,6 @@ public class CustomTitleBar extends LinearLayout {
     public CustomTitleBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.pub_titlebar, this, true);
-        rootView = findViewById(R.id.ll);
         rl_title_right = findViewById(R.id.rl_title_right);
         tvLeftBtn = findViewById(R.id.tv_title_left_btn);
         tvRightBtn = findViewById(R.id.tv_title_right_btn);
@@ -83,17 +83,16 @@ public class CustomTitleBar extends LinearLayout {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             //腾出状态栏高度
-            rootView.setPadding(0, ScreenUtil.getStatusBarHeight(), 0, 0);
+            setPadding(getPaddingLeft(), ScreenUtil.getStatusBarHeight(), getPaddingRight(), 0);
     }
 
     private void init() {
         ICON_SIZE = PixelUtil.dp2px(16);
-        ICON_PADDING = PixelUtil.dp2px(8);
 
-        leftBtnImgId = R.mipmap.title_left;
+        leftBtnImgId = R.mipmap.ic_title_left;
         titleBackground = getResources().getColor(R.color.top_title);
         titleTextColor = getResources().getColor(R.color.top_title_text);
-        rightBtnTextColor = getResources().getColor(R.color.top_title_text);
+        rightBtnTextColor = getResources().getColor(R.color.main_color);
         leftBtnTextColor = getResources().getColor(R.color.top_title_text);
         titleTextSize = 18;
         leftBtnTextSize = 16;
@@ -109,12 +108,12 @@ public class CustomTitleBar extends LinearLayout {
         setRightBtnTextColor(rightBtnTextColor);
         setRightBtnTextSize(rightBtnTextSize);
 
-        setLeftBtnImgId(leftBtnImgId);
+//        setLeftBtnImgId(leftBtnImgId);
         showLeftBtn(true);
         showLeftCloseBtn(false);
         showRightBtn(false);
         showRightBtnTips(false);
-        showGrayLine(true);
+        showGrayLine(false);
 
         tvLeftBtn.setOnClickListener(v -> {
             if (onLeftClickListener != null)
@@ -135,7 +134,7 @@ public class CustomTitleBar extends LinearLayout {
      *
      * @param leftBtnImgId 资源图片id
      */
-    public void setLeftBtnImgId(int leftBtnImgId) {
+    public void setLeftBtnImgId(@DrawableRes int leftBtnImgId) {
         setLeftBtnImgId(leftBtnImgId, ICON_SIZE, ICON_SIZE);
     }
 
@@ -144,14 +143,15 @@ public class CustomTitleBar extends LinearLayout {
      *
      * @param leftBtnImgId 资源图片id
      */
-    public void setLeftBtnImgId(int leftBtnImgId, int imgW, int imgH) {
+    public void setLeftBtnImgId(@DrawableRes int leftBtnImgId, int imgW, int imgH) {
         this.leftBtnImgId = leftBtnImgId;
         if (leftBtnImgId != 0) {
-            Drawable drawable = getResources().getDrawable(leftBtnImgId);
-            /// 这一步必须要做,否则不会显示.
-            drawable.setBounds(0, 0, imgW, imgH);
-            tvLeftBtn.setPadding(ICON_PADDING, 0, 0, 0);
-            tvLeftBtn.setCompoundDrawables(drawable, null, null, null);
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), leftBtnImgId, getContext().getTheme());
+            if (drawable != null) {
+                drawable.setBounds(0, 0, imgW, imgH);
+                tvLeftBtn.setPadding(tvLeftBtn.getPaddingLeft(), tvLeftBtn.getPaddingTop(), tvLeftBtn.getPaddingRight(), tvLeftBtn.getPaddingBottom());
+                tvLeftBtn.setCompoundDrawables(drawable, null, null, null);
+            }
         } else {
             tvLeftBtn.setCompoundDrawables(null, null, null, null);
         }
@@ -160,10 +160,11 @@ public class CustomTitleBar extends LinearLayout {
     public void setLeftCloseBtnImg(int leftCloseBtnImgId) {
         this.leftCloseBtnImgId = leftCloseBtnImgId;
         if (leftCloseBtnImgId != 0) {
-            Drawable drawable = getResources().getDrawable(leftCloseBtnImgId);
-            /// 这一步必须要做,否则不会显示.
-            drawable.setBounds(0, 0, ICON_SIZE - 8, ICON_SIZE - 8);
-            tvClose.setCompoundDrawables(drawable, null, null, null);
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), leftCloseBtnImgId, getContext().getTheme());
+            if (drawable != null) {
+                drawable.setBounds(0, 0, ICON_SIZE - 8, ICON_SIZE - 8);
+                tvClose.setCompoundDrawables(drawable, null, null, null);
+            }
         } else {
             tvClose.setCompoundDrawables(null, null, null, null);
         }
@@ -172,15 +173,21 @@ public class CustomTitleBar extends LinearLayout {
     /**
      * 设置右边按钮的资源图片
      */
-    public void setRightBtnImageId(int rightBtnImageId) {
+    public void setRightBtnImageId(@DrawableRes int rightBtnImageId, int imgW, int imgH) {
         this.rightBtnImageId = rightBtnImageId;
         if (rightBtnImageId != 0) {
-            Drawable drawable = getResources().getDrawable(rightBtnImageId);
-            /// 这一步必须要做,否则不会显示.
-            drawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE);
-            tvRightBtn.setPadding(0, 0, ICON_PADDING, 0);
-            tvRightBtn.setCompoundDrawables(null, null, drawable, null);
+            Drawable drawable = ResourcesCompat.getDrawable(getResources(), rightBtnImageId, getContext().getTheme());
+            if (drawable != null) {
+                drawable.setBounds(0, 0, imgW, imgH);
+                tvRightBtn.setPadding(tvRightBtn.getPaddingLeft(), tvRightBtn.getPaddingTop(), tvRightBtn.getPaddingRight(), tvRightBtn.getPaddingBottom());
+                tvRightBtn.setCompoundDrawables(null, null, drawable, null);
+            }
         }
+        showRightBtn(true);
+    }
+
+    public void setRightBtnImageId(@DrawableRes int rightBtnImageId) {
+        setRightBtnImageId(rightBtnImageId, ICON_SIZE, ICON_SIZE);
     }
 
     public void showRightBtn(boolean showRightBtn) {
@@ -224,16 +231,28 @@ public class CustomTitleBar extends LinearLayout {
         tvTitle.setText(titleText);
     }
 
+    public void setTitleText(@StringRes int titleTextRes) {
+        String title = null;
+        if (titleTextRes != 0) {
+            try {
+                title = getContext().getString(titleTextRes);
+            } catch (Exception e) {
+                Logger.w(e.getMessage());
+            }
+        }
+        setTitleText(title);
+    }
+
     public void setTitleBackground(@ColorInt int titleBackground) {
         this.titleBackground = titleBackground;
-        rootView.setBackgroundColor(titleBackground);
+        setBackgroundColor(titleBackground);
 //        tvLeftBtn.setBackgroundColor(titleBackground);
 //        tvClose.setBackgroundColor(titleBackground);
     }
 
     public void setTitleBackgroundRes(@ColorRes int titleBackground) {
         this.titleBackground = titleBackground;
-        rootView.setBackgroundResource(titleBackground);
+        setBackgroundResource(titleBackground);
 //        tvLeftBtn.setBackgroundColor(titleBackground);
 //        tvClose.setBackgroundColor(titleBackground);
     }
@@ -275,7 +294,7 @@ public class CustomTitleBar extends LinearLayout {
             showRightBtn(true);
             int beyondLength = rightBtnText.length() - 2;
             if (beyondLength > 0) {//超出2个字后，处理标题文字居中展示
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) tvTitle.getLayoutParams();
+                LayoutParams layoutParams = (LayoutParams) tvTitle.getLayoutParams();
                 layoutParams.leftMargin = PixelUtil.dp2px(12) * beyondLength;
                 tvTitle.setLayoutParams(layoutParams);
             }
@@ -290,10 +309,6 @@ public class CustomTitleBar extends LinearLayout {
     public void setRightBtnTextSize(int rightBtnTextSize) {
         this.rightBtnTextSize = PixelUtil.sp2px(rightBtnTextSize);
         tvRightBtn.setTextSize(rightBtnTextSize);
-    }
-
-    public RelativeLayout getRootView() {
-        return rootView;
     }
 
     public TextView getTvTitle() {
@@ -393,10 +408,10 @@ public class CustomTitleBar extends LinearLayout {
     }
 
     public void adjustStyle4WV() {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) tvTitle.getLayoutParams();
-        layoutParams.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+        LayoutParams layoutParams = (LayoutParams) tvTitle.getLayoutParams();
+        layoutParams.width = LayoutParams.MATCH_PARENT;
         layoutParams.leftMargin = PixelUtil.dp2px(5);
-        tvTitle.setLayoutParams(layoutParams);
+        layoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.tv_title_left_close);
         tvTitle.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         rl_title_right.setVisibility(GONE);
     }

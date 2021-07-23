@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:focusable="false"
+    tools:parentTag="android.widget.RelativeLayout"
     android:background="@color/top_title">
 
     <TextView
         android:id="@+id/tv_title_left_btn"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/top_title_h"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="10dp"
+        android:paddingLeft="@dimen/padding_lr"
+        android:paddingRight="10dp"
+        android:drawableLeft="@mipmap/ic_title_left"
         android:gravity="center"
         android:textColor="#ffffff" />
 
@@ -27,24 +29,22 @@
 
     <com.ly.common.view.MarqueeTextView
         android:id="@+id/m_tv_scenic_title"
-        android:layout_width="wrap_content"
+        style="@style/text_primary_m"
         android:layout_height="@dimen/top_title_h"
         android:layout_centerHorizontal="true"
-        android:layout_toLeftOf="@+id/rl_title_right"
-        android:layout_toRightOf="@+id/tv_title_left_close"
         android:ellipsize="marquee"
         android:gravity="center"
         android:marqueeRepeatLimit="marquee_forever"
         android:maxWidth="@dimen/top_title_text_w"
         android:singleLine="true"
         tools:text="标题标题标题标题标题标题标题标题标题标题标题"
-        android:textColor="@color/top_title_text"
         android:textSize="18sp" />
 
     <RelativeLayout
         android:id="@+id/rl_title_right"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/top_title_h"
+        android:paddingRight="@dimen/padding_lr"
         android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical"
         android:gravity="right">
@@ -53,7 +53,6 @@
             android:id="@+id/tv_title_right_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="10dp"
             android:gravity="center"
             android:text="确定"
             android:textColor="@color/white" />
@@ -74,4 +73,4 @@
         android:id="@+id/v_title_line"
         style="@style/gray_line"
         android:layout_below="@+id/m_tv_scenic_title" />
-</RelativeLayout>
+</merge>

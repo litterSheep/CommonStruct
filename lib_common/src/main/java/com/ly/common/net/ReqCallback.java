@@ -22,7 +22,7 @@ import retrofit2.Response;
  */
 public abstract class ReqCallback<T extends BaseResponse> implements Callback<T> {
 
-    private ReqStatusListener reqLoadSirListener, reqDialogListener;
+    public ReqStatusListener reqLoadSirListener, reqDialogListener;
     private boolean showToast = true;
 
     public ReqCallback() {
@@ -30,6 +30,10 @@ public abstract class ReqCallback<T extends BaseResponse> implements Callback<T>
 
     public ReqCallback(ReqStatusListener reqLoadSirListener, ReqStatusListener reqDialogListener) {
         this.reqLoadSirListener = reqLoadSirListener;
+        this.reqDialogListener = reqDialogListener;
+    }
+
+    public ReqCallback(ReqStatusListener reqDialogListener) {
         this.reqDialogListener = reqDialogListener;
     }
 
@@ -48,9 +52,12 @@ public abstract class ReqCallback<T extends BaseResponse> implements Callback<T>
                         if (reqLoadSirListener != null)
                             reqLoadSirListener.onSuccess();
                         onResult(body);
-
-                        return;
+                    } else {
+                        if (reqLoadSirListener != null)
+                            reqLoadSirListener.onEmpty();
+                        onResult();
                     }
+                    return;
                 } else {
                     if (showToast)
                         ToastUtil.showShort(body.msg);
@@ -70,6 +77,9 @@ public abstract class ReqCallback<T extends BaseResponse> implements Callback<T>
                 ToastUtil.showShort(BaseApp.get().getApplicationContext().getString(R.string.connect_server_fail));
             }
         onFailure(new BaseResponse(RespCode.ERROR));
+    }
+
+    public void onResult() {
     }
 
     public void onResult(@NonNull T t) {

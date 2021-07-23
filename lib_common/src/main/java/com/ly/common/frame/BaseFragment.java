@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
@@ -21,6 +20,7 @@ import com.kingja.loadsir.core.LoadService;
 import com.kingja.loadsir.core.LoadSir;
 import com.ly.common.R;
 import com.ly.common.annotation.PageTitle;
+import com.ly.common.annotation.UseEventBus;
 import com.ly.common.annotation.UseLoadSir;
 import com.ly.common.net.ReqCallback;
 import com.ly.common.net.ReqStatusListener;
@@ -32,7 +32,9 @@ import com.ly.common.view.dialog.LoadingDialog;
 import com.ly.common.view.loadSirCallBack.EmptyCallback;
 import com.ly.common.view.loadSirCallBack.ErrorCallback;
 import com.ly.common.view.loadSirCallBack.LoadingCallback;
+import com.orhanobut.logger.Logger;
 
+import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -47,7 +49,8 @@ import retrofit2.Call;
 public abstract class BaseFragment extends Fragment implements ReqStatusListener {
     protected boolean bIsViewCreated;
     protected boolean bIsDataLoaded;
-    public View rootView;
+    public ViewGroup rootView;
+    protected View contentView;
     public BaseActivity activity;
     private boolean mIsNeedLoadSir;
     //默认不需要标题
@@ -58,6 +61,7 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
     protected CustomTitleBar topTitleBar;
     protected String title;
     public LayoutInflater mInflater;
+    private boolean mUseEventBus = false;
 
     @Override
     public void onAttach(@NotNull Context context) {
@@ -72,13 +76,11 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
         this.mInflater = inflater;
         bIsViewCreated = true;
         initAnnotation();
-        if (null == rootView)
-            if (mIsNeedTitle) {
-                rootView = inflater.inflate(R.layout.activity_with_title, container, false);
-            } else {
-                rootView = inflater.inflate(R.layout.activity_no_title, container, false);
-            }
-        addContent();
+        if (mUseEventBus)
+            EventBus.getDefault().register(this);
+
+
+        addContent(inflater, container);
         if (mIsNeedTitle)
             initTitle(rootView);
         initViews(rootView);
@@ -97,36 +99,46 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
                 title = annotation.titleName();
             }
         }
+        if (getClass().isAnnotationPresent(UseEventBus.class)) {
+            UseEventBus annotation = getClass().getAnnotation(UseEventBus.class);
+            mUseEventBus = annotation != null && annotation.useEventBus();
+        }
     }
 
-    private void addContent() {
-        FrameLayout flContent = rootView.findViewById(R.id.fl_content);
-        View loadSirContent = null;
-        boolean isContentLayoutEmpty = false;
+    private void addContent(LayoutInflater inflater, ViewGroup container) {
+        ViewGroup tmp = (ViewGroup) inflater.inflate(mIsNeedTitle ? R.layout.activity_with_title : R.layout.activity_no_title, container, false);
+
+        //此处不能保证外部传入的layout合法，所以try catch
         try {
-            loadSirContent = View.inflate(getContext(), getLayoutResId(), null);
+            //加载子类传入的layout，如果需要标题就把它添加到tmp中，反之直接加载layout
+            View view = inflater.inflate(getLayoutResId(), tmp, mIsNeedTitle);
+
+            if (mIsNeedTitle) {
+                //此时rootView中包含标题及子类布局两个元素
+                rootView = (ViewGroup) view;
+                //取出子类传入的layout
+                contentView = rootView.getChildAt(1);
+            } else {
+                //不确定子类传入的layout是否为viewGroup容器
+                //为了保证rootView为viewGroup容器，将子类传入的view放入activity_no_title
+                tmp.addView(view);
+                contentView = rootView = tmp;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.e(String.valueOf(e.getMessage()));
+            //这种情况就是外部未传入合法的layout，我们给他一个空容器即可
+            contentView = rootView = tmp;
         }
-        if (loadSirContent != null) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT);
-            flContent.addView(loadSirContent, params);
-        } else {
-            loadSirContent = flContent;
-            isContentLayoutEmpty = true;
-        }
+
         //保持标题部分显示加载中、加载失败的页面
         if (mIsNeedLoadSir) {
-            loadService = LoadSir.getDefault().register(loadSirContent, (Callback.OnReloadListener) v -> {
+            loadService = LoadSir.getDefault().register(contentView, (Callback.OnReloadListener) v -> {
                 if (NetUtils.isConnected(getContext())) {
                     loadData();
                 } else {
                     showToast(R.string.network_unavailable);
                 }
             });
-            if (isContentLayoutEmpty)
-                rootView = loadService.getLoadLayout();
         }
     }
 
@@ -149,11 +161,11 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
     }
 
     public void cancelRequests() {
-        if(calls!=null&&!calls.isEmpty())
-        for (Call call : calls) {
-            if (call != null && !call.isCanceled())
-                call.cancel();
-        }
+        if (calls != null && !calls.isEmpty())
+            for (Call call : calls) {
+                if (call != null && !call.isCanceled())
+                    call.cancel();
+            }
     }
 
     @Override
@@ -164,6 +176,9 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
         bIsDataLoaded = false;
 
         cancelRequests();
+
+        if (mUseEventBus)
+            EventBus.getDefault().unregister(this);
 
         // 解决ViewPager中的问题
         if (null != rootView) {
@@ -268,6 +283,14 @@ public abstract class BaseFragment extends Fragment implements ReqStatusListener
     }
 
     public <T> void req(@NonNull Call<BaseResponse<T>> call, @NonNull ReqCallback<BaseResponse<T>> callback) {
+        req(call, callback, false);
+    }
+
+    public <T> void req(@NonNull Call<BaseResponse<T>> call, @NonNull ReqCallback<BaseResponse<T>> callback, boolean showLoading) {
+        if (showLoading) {
+            callback.reqDialogListener = this;
+            showDialog();
+        }
         call.enqueue(callback);
         if (calls == null)
             calls = new ArrayList<>();

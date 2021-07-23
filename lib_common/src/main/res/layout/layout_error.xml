@@ -15,7 +15,7 @@
         android:background="@color/black" />
 
     <TextView
-        style="@style/text_black"
+        style="@style/text_primary_l"
         android:layout_marginTop="25dp"
         android:text="@string/layout_network_fail" />
 

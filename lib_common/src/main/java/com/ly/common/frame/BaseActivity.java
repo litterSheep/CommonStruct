@@ -8,14 +8,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
+import android.widget.EditText;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
 
 import com.kingja.loadsir.callback.Callback;
 import com.kingja.loadsir.core.LoadService;
@@ -24,7 +25,7 @@ import com.ly.common.R;
 import com.ly.common.annotation.PageTitle;
 import com.ly.common.annotation.UseEventBus;
 import com.ly.common.annotation.UseLoadSir;
-import com.ly.common.manager.AppManager;
+import com.ly.common.manager.ActivityManager;
 import com.ly.common.net.ReqCallback;
 import com.ly.common.net.ReqStatusListener;
 import com.ly.common.net.respEntity.BaseResponse;
@@ -58,7 +59,8 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
     private boolean showLoading;
     protected CustomTitleBar topTitleBar;
     protected MyHandler handler;
-    protected View rootView;
+    protected ViewGroup rootView;
+    protected View contentView;
     private String activityName;
     private boolean mIsUseLoadSir;
     //默认都需要标题 如果不需要标题，在对应的类上添加@PageTitle(isNeedTitle = false)
@@ -72,11 +74,6 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         initAnnotation();
 
-        if (mIsNeedTitle) {
-            rootView = View.inflate(this, R.layout.activity_with_title, null);
-        } else {
-            rootView = View.inflate(this, R.layout.activity_no_title, null);
-        }
         addContent();
 
         setContentView(rootView);
@@ -123,7 +120,7 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
         if (mUseEventBus)
             EventBus.getDefault().register(this);
 
-        AppManager.get().addActivity(this);
+        ActivityManager.get().addActivity(this);
 
         activityName = getClass().getSimpleName();
     }
@@ -149,35 +146,55 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
     protected abstract void initViews();
 
     private void addContent() {
-        FrameLayout flContent = rootView.findViewById(R.id.fl_content);
-        View loadSirContent = null;
-        boolean isContentLayoutEmpty = false;
+        ViewGroup tmp = (ViewGroup) View.inflate(this, mIsNeedTitle ? R.layout.activity_with_title : R.layout.activity_no_title, null);
+
+        //此处不能保证外部传入的layout合法，所以try catch
         try {
-            loadSirContent = LayoutInflater.from(this).inflate(getLayoutResId(), new RelativeLayout(this), true);
-//            loadSirContent = View.inflate(this, getLayoutResId(), null);
+            //加载子类传入的layout，如果需要标题就把它添加到tmp中，反之直接加载layout
+            View view = LayoutInflater.from(this).inflate(getLayoutResId(), tmp, mIsNeedTitle);
+
+            if (mIsNeedTitle) {
+                //此时rootView中包含标题及子类布局两个元素
+                rootView = (ViewGroup) view;
+                //取出子类传入的layout
+                contentView = (ViewGroup) rootView.getChildAt(1);
+            } else {
+                //不确定子类传入的layout是否为viewGroup容器
+                //为了保证rootView为viewGroup容器，将子类传入的view放入activity_no_title
+                tmp.addView(view);
+                contentView = rootView = tmp;
+            }
         } catch (Exception e) {
-            Logger.e(e.getMessage());
-        }
-        if (loadSirContent != null) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT);
-            flContent.addView(loadSirContent, params);
-        } else {
-            loadSirContent = flContent;
-            isContentLayoutEmpty = true;
+            Logger.e(String.valueOf(e.getMessage()));
+            //这种情况就是外部未传入合法的layout，我们给他一个空容器即可
+            contentView = rootView = tmp;
         }
         //保持标题部分显示加载中、加载失败的页面
         if (mIsUseLoadSir) {
-            loadService = LoadSir.getDefault().register(loadSirContent, (Callback.OnReloadListener) v -> {
+            loadService = LoadSir.getDefault().register(contentView, (Callback.OnReloadListener) v -> {
                 if (NetUtils.isConnected(getApplicationContext())) {
                     loadData();
                 } else {
                     showToast(R.string.network_unavailable);
                 }
             });
-            if (isContentLayoutEmpty)
-                rootView = loadService.getLoadLayout();
         }
+    }
+
+    protected View addViewToContent(@LayoutRes int layout) {
+        contentView.setVisibility(View.GONE);
+        View view = LayoutInflater.from(this).inflate(layout, null, false);
+        rootView.addView(view);
+        return view;
+    }
+
+    protected void removeAllContent() {
+        rootView.removeView(contentView);
+    }
+
+    protected void removeViewFromContent(View view) {
+        rootView.removeView(view);
+        contentView.setVisibility(View.VISIBLE);
     }
 
     public void initTitle() {
@@ -188,9 +205,9 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
         }
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@StringRes int str) {
         if (topTitleBar != null)
-            topTitleBar.setTitleText(title);
+            topTitleBar.setTitleText(getStringById(str));
     }
 
     @Override
@@ -201,7 +218,7 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
             handler = null;
         }
         cancelRequests();
-        AppManager.get().removeActivity(this);
+        ActivityManager.get().removeActivity(this);
         dismissDialog();
         if (mUseEventBus)
             EventBus.getDefault().unregister(this);
@@ -291,6 +308,13 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
         }
     }
 
+    public void showKeyboard(@NonNull EditText et) {
+        et.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null)
+            imm.showSoftInput(et, InputMethodManager.SHOW_FORCED);
+    }
+
     public static class MyHandler extends Handler {
         WeakReference<BaseActivity> mActivity;
 
@@ -307,7 +331,30 @@ public abstract class BaseActivity extends StatusBarActivity implements ReqStatu
         }
     }
 
+    public void reqPermissions(String[] permissions, int reqCode) {
+        ActivityCompat.requestPermissions(this, permissions, reqCode);
+    }
+
+    public void reqNoData(@NonNull Call<BaseResponse> call, @NonNull ReqCallback<BaseResponse> callback) {
+        reqNoData(call, callback, false);
+    }
+
+    public void reqNoData(@NonNull Call<BaseResponse> call, @NonNull ReqCallback<BaseResponse> callback, boolean retainWhenDestroy) {
+        if (callback.reqDialogListener != null) {
+            showDialog();
+        }
+        call.enqueue(callback);
+        if (!retainWhenDestroy) {
+            if (calls == null)
+                calls = new ArrayList<>();
+            calls.add(call);
+        }
+    }
+
     public <T> void req(@NonNull Call<BaseResponse<T>> call, @NonNull ReqCallback<BaseResponse<T>> callback) {
+        if (callback.reqDialogListener != null) {
+            showDialog();
+        }
         call.enqueue(callback);
         if (calls == null)
             calls = new ArrayList<>();

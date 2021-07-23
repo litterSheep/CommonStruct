@@ -138,7 +138,7 @@ public abstract class BaseWebActivity extends BaseActivity {
         if (topTitleBar == null)
             return;
         topTitleBar.setTitleText(title);
-        topTitleBar.setLeftCloseBtnImg(R.mipmap.title_close);
+        topTitleBar.setLeftCloseBtnImg(R.mipmap.ic_title_close);
         topTitleBar.adjustStyle4WV();
         topTitleBar.setOnLeftClickListener(() -> {
             if (wv != null && wv.canGoBack()) {

@@ -3,5 +3,11 @@
 
     <dimen name="top_title_h">45dp</dimen>
     <dimen name="top_title_text_w">180dp</dimen>
+    <dimen name="padding_lr">20dp</dimen>
+
+
+    <dimen name="text_l">17sp</dimen>
+    <dimen name="text_m">15sp</dimen>
+    <dimen name="text_s">14sp</dimen>
 
 </resources>
